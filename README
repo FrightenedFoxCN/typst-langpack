@@ -1,0 +1,6 @@
+# typst-langpack
+
+Some simple typst templates for language learners.
+
+- `annotation.typ` document with annotation.
+- `bilingual.typ` interlinear bilingual document.
