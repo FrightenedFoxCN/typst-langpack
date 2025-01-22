@@ -3,21 +3,26 @@
 ])
 
 #let format_back_with_title(pair) = {
-  (strong(pair.at(0)), emph(pair.at(1)))
+  if pair.at(1) != "" {
+    (strong(pair.at(0)), emph(pair.at(1)))
+  }
 }
 
 #let parse_back(res_back, title-line, title) = align(horizon + center, [
   #if title {
-    box(width: 80%, grid(
+    box(width: 90%, grid(
       columns: (auto, auto),
       row-gutter: 14pt,
-      align: (left, center),
+      column-gutter: 12pt,
+      align: (right, left),
       ..title-line.zip(res_back).map(format_back_with_title).flatten()
     ))
   } else {
     for i in res_back {
-      emph(if title {i.at(1)} else {i})
-      linebreak()
+      if i != "" {
+        emph(if title {i.at(1)} else {i})
+        linebreak()
+      }
     }
   }
 ])
@@ -52,15 +57,37 @@
     margin: (x: 16pt, y: 32pt)
   )
   _ = data.remove(0)
-  data = data.chunks(4)
-  for i in data {
+  data = data.chunks(4).chunks(2)
+
+  for pairs in data {
+    let left = pairs.at(0)
+    let right = if pairs.len() > 1 {pairs.at(1)} else {()}
+
+    left = left + (("", ) * title-line.len(), ) * (4 - left.len())
+    right = right + (("", ) * title-line.len(), ) * (4 - right.len())
+
+    let left-front = left.map(i => split_row(i, front, title-line, front-title, back-title).at(0))
+    let left-back = left.map(i => split_row(i, front, title-line, front-title, back-title).at(1))
+
+    let right-front = right.map(i => split_row(i, front, title-line, front-title, back-title).at(0))
+    let right-back = right.map(i => split_row(i, front, title-line, front-title, back-title).at(1))
+
     grid(
       columns: (1fr, 1fr),
       rows: (1fr, 1fr, 1fr, 1fr),
       column-gutter: 16pt,
       row-gutter: 40pt,
 
-      ..i.map(row => split_row(row, front, title-line, front-title, back-title)).flatten().map(styling)
+      ..(left-front.zip(right-front)).flatten().map(styling)
+    )
+
+    grid(
+      columns: (1fr, 1fr),
+      rows: (1fr, 1fr, 1fr, 1fr),
+      column-gutter: 16pt,
+      row-gutter: 40pt,
+
+      ..(left-back.zip(right-back)).flatten().map(styling)
     )
   }
 }
