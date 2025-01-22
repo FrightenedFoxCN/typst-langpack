@@ -5,6 +5,8 @@
 #let format_back_with_title(pair) = {
   if pair.at(1) != "" {
     (strong(pair.at(0)), emph(pair.at(1)))
+  } else {
+    ()
   }
 }
 
@@ -20,8 +22,7 @@
   } else {
     for i in res_back {
       if i != "" {
-        emph(if title {i.at(1)} else {i})
-        linebreak()
+        emph(i)
       }
     }
   }
@@ -48,13 +49,14 @@
 #let flashcard(
   source,
   front: 1,
+  delimiter: ",",
   front-title: false,
   back-title: true
 ) = {
-  let data = csv(source)
+  let data = csv(source, delimiter: delimiter)
   let title-line = data.at(0)
   set page(
-    margin: (x: 16pt, y: 32pt)
+    margin: (x: 8pt, y: 16pt)
   )
   _ = data.remove(0)
   data = data.chunks(4).chunks(2)
